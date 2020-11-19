@@ -16,14 +16,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        InfluxDbClientHelper.queryAsync(new InfluxDbClientHelper.OnQueryResponseListener() {
+        String BrightnessQuery = "from(bucket: \"3261957's Bucket\")\n" +
+                "  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n" +
+                "  |> filter(fn: (r) => r[\"_measurement\"] == \"Brightness Sensor\")\n" +
+                "  |> filter(fn: (r) => r[\"_field\"] == \"br\")\n" +
+                "  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n" +
+                "  |> yield(name: \"mean\")";
+        String TempAndAirQuery = "from(bucket: \"3261957's Bucket\")\n" +
+                "  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n" +
+                "  |> filter(fn: (r) => r[\"_measurement\"] == \"Brightness Sensor\")\n" +
+                "  |> filter(fn: (r) => r[\"_field\"] == \"br\")\n" +
+                "  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n" +
+                "  |> yield(name: \"mean\")";
+
+        InfluxDbClientHelper.queryAsync(BrightnessQuery, new InfluxDbClientHelper.OnQueryResponseListener() {
             @Override
             public void OnResponse(List<FluxTable> tables) {
                 Toast.makeText(getBaseContext(), String.format("tables %s", tables.size()), Toast.LENGTH_LONG).show();
             }
         });
-
-
     }
 }
 

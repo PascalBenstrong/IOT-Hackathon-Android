@@ -37,7 +37,7 @@ public final class InfluxDbClientHelper {
         return client;
     }
 
-    public static void queryAsync(OnQueryResponseListener listener){
+    public static void queryAsync(String query, OnQueryResponseListener listener){
 
         networkExecutor.execute(new Runnable() {
             @Override
@@ -45,30 +45,17 @@ public final class InfluxDbClientHelper {
                 InfluxDBClient client = instance.getClient();
 
                 // a simple query to request data from a bucket in the last 24 hours
-                String brightnessQuery = String.format("from(bucket: \"3261957's Bucket\")\n" +
-                        "  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n" +
-                        "  |> filter(fn: (r) => r[\"_measurement\"] == \"Brightness Sensor\")\n" +
-                        "  |> filter(fn: (r) => r[\"_field\"] == \"br\")\n" +
-                        "  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n" +
-                        "  |> yield(name: \"mean\")", bucket);
-
-                String tempAndAirQuery = String.format("from(bucket: \"3261957's Bucket\")\n" +
-                        "  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n" +
-                        "  |> filter(fn: (r) => r[\"_measurement\"] == \"Brightness Sensor\")\n" +
-                        "  |> filter(fn: (r) => r[\"_field\"] == \"br\")\n" +
-                        "  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n" +
-                        "  |> yield(name: \"mean\")", bucket);
+                String Query = String.format(query, bucket);
 
                 // make the query
-                List<FluxTable> brightnessTables = client.getQueryApi().query(brightnessQuery, org);
-                List<FluxTable> tempAndAirtables = client.getQueryApi().query(tempAndAirQuery, org);
+                List<FluxTable> Tables = client.getQueryApi().query(Query, org);
+
 
                 // send data back to ui thread
                 uiHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        listener.OnResponse(brightnessTables);
-                        listener.OnResponse(tempAndAirtables);
+                        listener.OnResponse(Tables);
 
                     }
                 });
