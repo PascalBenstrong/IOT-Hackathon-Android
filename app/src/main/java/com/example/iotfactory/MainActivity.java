@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
                 double airQuality = (double)airQualityRecords.get(airQualityRecords.size() - 1).getValue();
 
                 setWaveProgress(airQuality);
-                setData(45, 180);
+                setData(temperatureRecords);
                 //setLineChartData(temperatureRecords);
 
             }
@@ -207,8 +207,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setLineChartData(List<FluxRecord> temperatureRecords){
 
-/*        List<Entry> y = new ArrayList<Entry>();
-        List<String> x = new ArrayList<String>();
+        ArrayList<Entry> values = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<>();
 
         for(int i = 0; i < temperatureRecords.size(); i++){
 
@@ -216,65 +216,18 @@ public class MainActivity extends AppCompatActivity {
             long unixNanoSeconds = Long.parseLong(record.getValueByKey("_time").toString());
             Date date = new Date(unixNanoSeconds/1000000);
 
-
             SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-            x.add(formatter.format(date));
             Entry data = new Entry(Float.parseFloat(record.getValue().toString()),i);
-            y.add(data);
-
+            values.add(data);
+            labels.add(formatter.format(date));
         }
 
-        LineDataSet set1 = new LineDataSet(y, "Temperature");
-        set1.setColors(new int[]{ColorTemplate.rgb("#FF4080")});
-        set1.setAxisDependency(YAxis.AxisDependency.LEFT);
-        set1.setLineWidth(1.5f);
-        set1.setCircleRadius(2f);
-
-        LineData data = new LineData(x, set1);
-        lineChart.setData(data);
-        lineChart.invalidate();*/
-
-        List<Entry> valsComp1 = new ArrayList<Entry>();
-        List<Entry> valsComp2 = new ArrayList<Entry>();
-
-        Entry c1e1 = new Entry(0f, 100000f); // 0 == quarter 1
-        valsComp1.add(c1e1);
-        Entry c1e2 = new Entry(1f, 140000f); // 1 == quarter 2 ...
-        valsComp1.add(c1e2);
-        Entry c3e1 = new Entry(2f, 120000f); // 0 == quarter 1
-        valsComp2.add(c3e1);
-        Entry c4e1 = new Entry(3f, 140000f); // 0 == quarter 1
-        valsComp2.add(c4e1);
-        // and so on ...
-        Entry c2e1 = new Entry(0f, 130000f); // 0 == quarter 1
-        valsComp2.add(c2e1);
-        Entry c2e2 = new Entry(1f, 115000f); // 1 == quarter 2 ...
-        valsComp2.add(c2e2);
-        Entry c3e2 = new Entry(2f, 90000f); // 1 == quarter 2 ...
-        valsComp2.add(c3e2);
-        Entry c4e2 = new Entry(3f, 105000f); // 1 == quarter 2 ...
-        valsComp2.add(c4e2);
-
-
-        LineDataSet setComp1 = new LineDataSet(valsComp1, "Company 1");
-        setComp1.setAxisDependency(YAxis.AxisDependency.LEFT);
-        LineDataSet setComp2 = new LineDataSet(valsComp2, "Company 2");
-        setComp2.setAxisDependency(YAxis.AxisDependency.LEFT);
-
-        // use the interface ILineDataSet
-        List<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
-        dataSets.add(setComp1);
-        dataSets.add(setComp2);
-        LineData data = new LineData(dataSets);
-        lineChart.setData(data);
-        lineChart.invalidate(); // refresh
 
         // the labels that should be drawn on the XAxis
-        final String[] quarters = new String[] { "Q1", "Q2", "Q3", "Q4" };
         ValueFormatter formatter = new ValueFormatter() {
             @Override
             public String getAxisLabel(float value, AxisBase axis) {
-                return quarters[(int) value];
+                return labels.get((int) value);
             }
         };
         XAxis xAxis = lineChart.getXAxis();
@@ -291,15 +244,51 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void setData(int count, float range) {
+    private void setData(List<FluxRecord> temperatureRecords) {
 
         ArrayList<Entry> values = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<>();
+
+        int count = 40;
+        int range = 100;
 
         for (int i = 0; i < count; i++) {
 
             float val = (float) (Math.random() * range) - 30;
             values.add(new Entry(i, val));
         }
+
+/*        for(int i = 0; i < temperatureRecords.size(); i++){
+
+            FluxRecord record = temperatureRecords.get(i);
+            long unixNanoSeconds = Long.parseLong(record.getValueByKey("_time").toString());
+            Date date = new Date(unixNanoSeconds/1000000);
+
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+            Entry data = new Entry(Float.parseFloat(record.getValue().toString()),i);
+            values.add(data);
+            labels.add(formatter.format(date));
+        }*/
+
+        for (int i = 0; i < temperatureRecords.size(); i++){
+            FluxRecord record = temperatureRecords.get(i);
+            long unixNanoSeconds = Long.parseLong(record.getValueByKey("_time").toString());
+            Date date = new Date(unixNanoSeconds/1000000);
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-HH:mm");
+            labels.add(formatter.format(date));
+        }
+
+        // the labels that should be drawn on the XAxis
+        ValueFormatter formatter = new ValueFormatter() {
+            @Override
+            public String getAxisLabel(float value, AxisBase axis) {
+                return labels.get((int) value);
+            }
+        };
+
+        XAxis xAxis = lineChart.getXAxis();
+        xAxis.setGranularity(1f); // minimum axis-step (interval) is 1
+        xAxis.setValueFormatter(formatter);
 
         LineDataSet set1;
 
@@ -312,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
             lineChart.notifyDataSetChanged();
         } else {
             // create a dataset and give it a type
-            set1 = new LineDataSet(values, "DataSet 1");
+            set1 = new LineDataSet(values, "Temperature");
 
             set1.setDrawIcons(false);
 
@@ -349,7 +338,6 @@ public class MainActivity extends AppCompatActivity {
                     return lineChart.getAxisLeft().getAxisMinimum();
                 }
             });
-
 
             set1.setFillColor(Color.BLACK);
 
