@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.google.gson.Gson;
+import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
 
 import java.util.List;
@@ -42,9 +44,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void OnResponse(List<FluxTable> tables) {
 
-                Toast.makeText(getBaseContext(), String.format("tables %s", tables.get(0).getColumns().get(0).getLabel()), Toast.LENGTH_LONG).show();
+                List<FluxRecord> airQualityRecords = tables.get(1).getRecords();
+                List<FluxRecord> temperatureRecords = tables.get(0).getRecords();
+                // get the last air quality
+                double airQuality = (double)airQualityRecords.get(airQualityRecords.size() - 1).getValue();
+
+                waveLoadingView.setProgressValue((int)airQuality);
+
+
+                Toast.makeText(getBaseContext(), String.format("%s %s", tables.get(1).getRecords().get(0).getField(),tables.get(1).getRecords().get(0).getValue()), Toast.LENGTH_LONG).show();
             }
         });
+
+    }
+
+    public final class LineData{
+
 
     }
 
