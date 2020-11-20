@@ -18,6 +18,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.gson.Gson;
+import com.influxdb.client.InfluxDBClientOptions;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
 
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 "  |> filter(fn: (r) => r[\"_measurement\"] == \"Environment Sensor\")\n" +
                 "  |> filter(fn: (r) => r[\"_field\"] == \"t\" or r[\"_field\"] == \"iaq\")\n" +
                 "  |> aggregateWindow(every: 4m, fn: mean, createEmpty: false)\n" +
+                "  |> map(fn: (r) => ({ r with _time: uint(v: r._time) }))" +
                 "  |> yield(name: \"mean\")";
 
 
@@ -82,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             public void OnResponse(List<FluxTable> tables) {
 
                 List<FluxRecord> airQualityRecords = tables.get(1).getRecords();
-                List<FluxRecord> temperatureRecords = tables.get(0).getRecords();
+                List<FluxRecord> temperatureRecords = tables.get(tables.size()-1).getRecords();
 
                 // get the last air quality
                 double airQuality = (double)airQualityRecords.get(airQualityRecords.size() - 1).getValue();
@@ -90,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
                 setWaveProgress(airQuality);
                 setLineChartData(temperatureRecords);
 
-                //Toast.makeText(getBaseContext(), String.format("%s %s", tables.get(1).getRecords().get(0).getField(),tables.get(1).getRecords().get(0).getValue()), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -148,25 +149,28 @@ public class MainActivity extends AppCompatActivity {
 
     private void setLineChartData(List<FluxRecord> temperatureRecords){
 
-        List<Entry> x = new ArrayList<Entry>();
-        List<String> y = new ArrayList<String>();
-
-        System.out.println(new Gson().toJson(temperatureRecords));
+        List<Entry> y = new ArrayList<Entry>();
+        List<String> x = new ArrayList<String>();
 
         for(int i = 0; i < temperatureRecords.size(); i++){
 
             FluxRecord record = temperatureRecords.get(i);
+            long unixNanoSeconds = Long.parseLong(record.getValueByKey("_time").toString());
+            Date date = new Date(unixNanoSeconds/1000000);
 
-            x.add(new Entry(Float.parseFloat(record.getValue().toString()), i));
-            y.add(record.getTime().toString());
+
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+            x.add(formatter.format(date));
+            y.add(new Entry(Float.parseFloat(record.getValue().toString()), i));
 
         }
 
-        LineDataSet set1 = new LineDataSet(x, "Temperature");
+        LineDataSet set1 = new LineDataSet(y, "Temperature");
         set1.setColors(new int[]{ColorTemplate.rgb("#FF4080")});
         set1.setLineWidth(1.5f);
-        set1.setCircleRadius(4f);
-        LineData data = new LineData(y, set1);
+        set1.setCircleRadius(2f);
+
+        LineData data = new LineData(x, set1);
         lineChart.setData(data);
         lineChart.invalidate();
     }
