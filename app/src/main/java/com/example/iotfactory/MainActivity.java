@@ -234,27 +234,6 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Entry> values = new ArrayList<>();
         ArrayList<String> labels = new ArrayList<>();
 
-/*        int count = 40;
-        int range = 100;
-
-        for (int i = 0; i < count; i++) {
-
-            float val = (float) (Math.random() * range) - 30;
-            values.add(new Entry(i, val));
-        }*/
-
-/*        for(int i = 0; i < temperatureRecords.size(); i++){
-
-            FluxRecord record = temperatureRecords.get(i);
-            long unixNanoSeconds = Long.parseLong(record.getValueByKey("_time").toString());
-            Date date = new Date(unixNanoSeconds/1000000);
-
-            SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-            Entry data = new Entry(Float.parseFloat(record.getValue().toString()),i);
-            values.add(data);
-            labels.add(formatter.format(date));
-        }*/
-
         float max = 0;
         float min = 0;
 
