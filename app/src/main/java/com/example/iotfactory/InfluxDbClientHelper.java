@@ -3,6 +3,7 @@ package com.example.iotfactory;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.google.gson.Gson;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.query.FluxTable;
@@ -49,7 +50,6 @@ public final class InfluxDbClientHelper {
 
                 // make the query
                 List<FluxTable> Tables = client.getQueryApi().query(Query, org);
-
 
                 // send data back to ui thread
                 uiHandler.post(new Runnable() {

@@ -78,7 +78,7 @@
                                 android:orientation="horizontal">
 
                                 <RelativeLayout
-                                    android:layout_width="14dp"
+                                    android:layout_width="12dp"
                                     android:layout_height="14dp"
                                     android:layout_marginEnd="10dp"
                                     android:background="#D13535"></RelativeLayout>
@@ -258,14 +258,22 @@
                             app:wlv_progressValue="40"
                             app:wlv_round_rectangle="true"
                             app:wlv_shapeType="circle"
-                            app:wlv_titleCenter="Center Title"
-                            app:wlv_titleCenterColor="@android:color/white"
-                            app:wlv_titleCenterSize="24sp"
-                            app:wlv_titleCenterStrokeColor="@android:color/holo_blue_dark"
+                            app:wlv_titleCenter="76"
+                            app:wlv_titleCenterColor="@color/black"
+                            app:wlv_titleCenterSize="30sp"
                             app:wlv_titleCenterStrokeWidth="3dp"
                             app:wlv_triangle_direction="north"
                             app:wlv_waveAmplitude="70"
-                            app:wlv_waveColor="#0000ff" />
+                            app:wlv_waveColor="#0000ff"/>
+
+                        <TextView
+                            android:id="@+id/bottom_text_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/wave_progress"
+                            android:textSize="18sp"
+                            android:textColor="#484848"
+                            android:text="Unhealthy for Sensitive Groups"/>
 
                     </RelativeLayout>
 
