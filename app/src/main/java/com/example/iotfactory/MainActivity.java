@@ -59,21 +59,6 @@ public class MainActivity extends AppCompatActivity {
         bottom_title = findViewById(R.id.bottom_text_view);
         bottom_title.setVisibility(View.GONE);
 
-        /*lineChart.setDrawGridBackground(true);
-        lineChart.setTouchEnabled(true);
-        lineChart.setDragEnabled(true);
-        lineChart.setScaleEnabled(true);
-        lineChart.setPinchZoom(true);
-        lineChart.getXAxis().setTextSize(14f);
-        lineChart.getAxisLeft().setTextSize(14f);
-        XAxis xl = lineChart.getXAxis();
-        xl.setAvoidFirstLastClipping(true);
-        YAxis leftAxis = lineChart.getAxisLeft();
-        leftAxis.setInverted(true);
-        YAxis rightAxis = lineChart.getAxisRight();
-        rightAxis.setEnabled(false);
-        Legend l = lineChart.getLegend();
-        l.setForm(Legend.LegendForm.LINE);*/
 
         // background color
         lineChart.setBackgroundColor(Color.WHITE);
@@ -131,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 "  |> range(start: -24h)\n" +
                 "  |> filter(fn: (r) => r[\"_measurement\"] == \"Environment Sensor\")\n" +
                 "  |> filter(fn: (r) => r[\"_field\"] == \"t\" or r[\"_field\"] == \"iaq\")\n" +
-                "  |> aggregateWindow(every: 4m, fn: mean, createEmpty: false)\n" +
+                "  |> aggregateWindow(every: 30m, fn: mean, createEmpty: false)\n" +
                 "  |> map(fn: (r) => ({ r with _time: uint(v: r._time) }))" +
                 "  |> yield(name: \"mean\")";
 
@@ -249,14 +234,14 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Entry> values = new ArrayList<>();
         ArrayList<String> labels = new ArrayList<>();
 
-        int count = 40;
+/*        int count = 40;
         int range = 100;
 
         for (int i = 0; i < count; i++) {
 
             float val = (float) (Math.random() * range) - 30;
             values.add(new Entry(i, val));
-        }
+        }*/
 
 /*        for(int i = 0; i < temperatureRecords.size(); i++){
 
@@ -270,13 +255,37 @@ public class MainActivity extends AppCompatActivity {
             labels.add(formatter.format(date));
         }*/
 
+        float max = 0;
+        float min = 0;
+
         for (int i = 0; i < temperatureRecords.size(); i++){
             FluxRecord record = temperatureRecords.get(i);
             long unixNanoSeconds = Long.parseLong(record.getValueByKey("_time").toString());
             Date date = new Date(unixNanoSeconds/1000000);
             SimpleDateFormat formatter = new SimpleDateFormat("dd-HH:mm");
             labels.add(formatter.format(date));
+
+
+            // values
+            float value = Float.parseFloat(record.getValue().toString()) ;
+
+            if(value > max){
+                max = value;
+            }else if(value < min){
+                min = value;
+            }
+            Entry entry = new Entry(i, value);
+
+            //System.out.println("value: "+value);
+
+            values.add(entry);
         }
+
+        // set max and min values
+
+        YAxis yAxis = lineChart.getAxisLeft();
+        yAxis.setAxisMaximum((int)(max + max * 0.5) );
+        yAxis.setAxisMinimum((int)(min - min * 0.25) );
 
         // the labels that should be drawn on the XAxis
         ValueFormatter formatter = new ValueFormatter() {
@@ -309,8 +318,8 @@ public class MainActivity extends AppCompatActivity {
             set1.enableDashedLine(10f, 5f, 0f);
 
             // black lines and points
-            set1.setColor(Color.BLACK);
-            set1.setCircleColor(Color.BLACK);
+            set1.setColor(Color.parseColor("#E07979"));
+            set1.setCircleColor(Color.parseColor("#E07979"));
 
             // line thickness and point size
             set1.setLineWidth(1f);
@@ -339,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            set1.setFillColor(Color.BLACK);
+            set1.setFillColor(Color.parseColor("#A8E07979"));
 
             ArrayList<ILineDataSet> dataSets = new ArrayList<>();
             dataSets.add(set1); // add the data sets
