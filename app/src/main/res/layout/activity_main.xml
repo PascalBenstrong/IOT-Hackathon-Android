@@ -248,7 +248,7 @@
                         android:layout_toEndOf="@id/text_content">
 
                         <me.itangqi.waveloadingview.WaveLoadingView
-                            android:id="@+id/waveLoadingView"
+                            android:id="@+id/wave_progress"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
@@ -290,7 +290,7 @@
 
                 <com.github.mikephil.charting.charts.LineChart
                     android:layout_gravity="center"
-                    android:id="@+id/line"
+                    android:id="@+id/line_graph"
                     android:layout_width="match_parent"
                     android:layout_height="300dp">
                 </com.github.mikephil.charting.charts.LineChart>
