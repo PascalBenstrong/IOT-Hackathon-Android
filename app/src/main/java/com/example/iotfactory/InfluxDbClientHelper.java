@@ -11,11 +11,13 @@ import com.influxdb.query.FluxTable;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public final class InfluxDbClientHelper {
 
     // background worker because we can not make network call on ui/main thread
-    private static final Executor networkExecutor = Executors.newSingleThreadExecutor();
+    private static final ScheduledExecutorService networkExecutor = Executors.newScheduledThreadPool(1);
     // handler to push data back to main thread
     private static final Handler uiHandler = new Handler(Looper.getMainLooper());
 
@@ -40,7 +42,7 @@ public final class InfluxDbClientHelper {
 
     public static void queryAsync(String query, OnQueryResponseListener listener){
 
-        networkExecutor.execute(new Runnable() {
+        Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 InfluxDBClient client = instance.getClient();
@@ -60,7 +62,8 @@ public final class InfluxDbClientHelper {
                     }
                 });
             }
-        });
+        };
+        networkExecutor.scheduleAtFixedRate(runnable, 0, 2, TimeUnit.MINUTES);
 
     }
 
