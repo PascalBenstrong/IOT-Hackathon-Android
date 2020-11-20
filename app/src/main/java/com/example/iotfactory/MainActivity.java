@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private void loadEnvironmentData(){
 
         String environment = "from(bucket: \"3261957's Bucket\")\n" +
-                "  |> range(start: -10h, stop: -7h)\n" +
+                "  |> range(start: -10h, stop: -5h)\n" +
                 "  |> filter(fn: (r) => r[\"_measurement\"] == \"Environment Sensor\")\n" +
                 "  |> filter(fn: (r) => r[\"_field\"] == \"t\" or r[\"_field\"] == \"iaq\")\n" +
                 "  |> aggregateWindow(every: 4m, fn: mean, createEmpty: false)\n" +
@@ -65,50 +65,50 @@ public class MainActivity extends AppCompatActivity {
 
     private void setWaveProgress(double progress){
         waveLoadingView.setProgressValue((int)(progress*100/500));
-        bottom_title.setVisibility(View.VISIBLE);
+        bottom_title.setVisibility(View.GONE);
 
         progress = (int)progress;
         if(progress < 51){
             waveLoadingView.setBorderColor(Color.parseColor("#35D15F"));
             waveLoadingView.setWaveColor(Color.parseColor("#35D15F"));
-            //waveLoadingView.setTopTitle("Good");
-            bottom_title.setText("Good");
+            waveLoadingView.setTopTitle("Good");
+            //bottom_title.setText("Good");
             waveLoadingView.setCenterTitle(""+(int)progress);
 
         }else if(progress < 101){
             waveLoadingView.setBorderColor(Color.parseColor("#3583D1"));
             waveLoadingView.setWaveColor(Color.parseColor("#3583D1"));
-            //waveLoadingView.setTopTitle("Moderate");
-            bottom_title.setText("Moderate");
+            waveLoadingView.setTopTitle("Moderate");
+            //bottom_title.setText("Moderate");
             waveLoadingView.setCenterTitle(""+(int)progress);
 
         }else if(progress < 151){
             waveLoadingView.setBorderColor(Color.parseColor("#7700FF"));
             waveLoadingView.setWaveColor(Color.parseColor("#7700FF"));
-            //waveLoadingView.setTopTitle("Unhealthy for Sensitive Groups");
-            bottom_title.setText("Unhealthy for Sensitive Groups");
-            //bottom_title.setVisibility(View.VISIBLE);
+            waveLoadingView.setTopTitle("Unhealthy for Sensitive Groups");
+            //bottom_title.setText("Unhealthy for Sensitive Groups");
+            bottom_title.setVisibility(View.VISIBLE);
             waveLoadingView.setCenterTitle(""+(int)progress);
 
         }else if(progress < 201){
             waveLoadingView.setBorderColor(Color.parseColor("#E8C61A"));
             waveLoadingView.setWaveColor(Color.parseColor("#E8C61A"));
-            //waveLoadingView.setTopTitle("Unhealthy");
-            bottom_title.setText("Unhealthy");
+            waveLoadingView.setTopTitle("Unhealthy");
+            //bottom_title.setText("Unhealthy");
             waveLoadingView.setCenterTitle(""+(int)progress);
 
         }else if(progress < 301){
             waveLoadingView.setBorderColor(Color.parseColor("#F59300"));
             waveLoadingView.setWaveColor(Color.parseColor("#F59300"));
-            //waveLoadingView.setTopTitle("Very Unhealthy");
-            bottom_title.setText("Very Unhealthy");
+            waveLoadingView.setTopTitle("Very Unhealthy");
+            //bottom_title.setText("Very Unhealthy");
             waveLoadingView.setCenterTitle(""+(int)progress);
 
         }else{
             waveLoadingView.setBorderColor(Color.parseColor("#D13535"));
             waveLoadingView.setWaveColor(Color.parseColor("#D13535"));
-            //waveLoadingView.setTopTitle("Hazardous");
-            bottom_title.setText("Hazardous");
+            waveLoadingView.setTopTitle("Hazardous");
+            //bottom_title.setText("Hazardous");
             waveLoadingView.setCenterTitle(""+(int)progress);
         }
     }
