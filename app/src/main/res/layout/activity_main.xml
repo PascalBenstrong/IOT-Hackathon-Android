@@ -300,7 +300,7 @@
 
                 <com.github.mikephil.charting.charts.LineChart
                     android:layout_below="@id/temperature_heading"
-                    android:layout_margin="5dp"
+                    android:layout_margin="10dp"
                     android:layout_gravity="center"
                     android:id="@+id/line_graph"
                     android:layout_width="match_parent"
