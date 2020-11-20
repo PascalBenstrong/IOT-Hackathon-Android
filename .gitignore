@@ -13,4 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+<<<<<<< Updated upstream
 **/.idea
+=======
+**/.idea
+>>>>>>> Stashed changes

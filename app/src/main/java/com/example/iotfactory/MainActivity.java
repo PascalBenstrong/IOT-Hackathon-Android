@@ -31,17 +31,18 @@ public class MainActivity extends AppCompatActivity {
     private void loadEnvironmentData(){
 
         String environment = "from(bucket: \"3261957's Bucket\")\n" +
-                "  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n" +
+                "  |> range(start: -6h)\n" +
                 "  |> filter(fn: (r) => r[\"_measurement\"] == \"Environment Sensor\")\n" +
                 "  |> filter(fn: (r) => r[\"_field\"] == \"t\" or r[\"_field\"] == \"iaq\")\n" +
-                "  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n" +
+                "  |> aggregateWindow(every: 4m, fn: mean, createEmpty: false)\n" +
                 "  |> yield(name: \"mean\")";
 
 
         InfluxDbClientHelper.queryAsync(environment, new InfluxDbClientHelper.OnQueryResponseListener() {
             @Override
             public void OnResponse(List<FluxTable> tables) {
-                Toast.makeText(getBaseContext(), String.format("tables %s", tables.size()), Toast.LENGTH_LONG).show();
+
+                Toast.makeText(getBaseContext(), String.format("tables %s", tables.get(0).getColumns().get(0).getLabel()), Toast.LENGTH_LONG).show();
             }
         });
 

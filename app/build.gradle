@@ -39,4 +39,5 @@ dependencies {
     implementation "com.influxdb:influxdb-client-java:1.8.0"
     implementation 'me.itangqi.waveloadingview:library:0.3.5'
     implementation 'com.github.PhilJay:MPAndroidChart:v2.2.4'
+
 }
