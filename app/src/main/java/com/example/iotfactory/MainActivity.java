@@ -3,16 +3,30 @@ package com.example.iotfactory;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.gson.Gson;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import me.itangqi.waveloadingview.WaveLoadingView;
@@ -33,13 +47,30 @@ public class MainActivity extends AppCompatActivity {
         bottom_title = findViewById(R.id.bottom_text_view);
         bottom_title.setVisibility(View.GONE);
 
+        lineChart.setDrawGridBackground(true);
+        lineChart.setDescription("");
+        lineChart.setTouchEnabled(true);
+        lineChart.setDragEnabled(true);
+        lineChart.setScaleEnabled(true);
+        lineChart.setPinchZoom(true);
+        lineChart.getXAxis().setTextSize(14f);
+        lineChart.getAxisLeft().setTextSize(14f);
+        XAxis xl = lineChart.getXAxis();
+        xl.setAvoidFirstLastClipping(true);
+        YAxis leftAxis = lineChart.getAxisLeft();
+        leftAxis.setInverted(true);
+        YAxis rightAxis = lineChart.getAxisRight();
+        rightAxis.setEnabled(false);
+        Legend l = lineChart.getLegend();
+        l.setForm(Legend.LegendForm.LINE);
+
         loadEnvironmentData();
     }
 
     private void loadEnvironmentData(){
 
         String environment = "from(bucket: \"3261957's Bucket\")\n" +
-                "  |> range(start: -10h, stop: -5h)\n" +
+                "  |> range(start: -24h)\n" +
                 "  |> filter(fn: (r) => r[\"_measurement\"] == \"Environment Sensor\")\n" +
                 "  |> filter(fn: (r) => r[\"_field\"] == \"t\" or r[\"_field\"] == \"iaq\")\n" +
                 "  |> aggregateWindow(every: 4m, fn: mean, createEmpty: false)\n" +
@@ -52,10 +83,12 @@ public class MainActivity extends AppCompatActivity {
 
                 List<FluxRecord> airQualityRecords = tables.get(1).getRecords();
                 List<FluxRecord> temperatureRecords = tables.get(0).getRecords();
+
                 // get the last air quality
                 double airQuality = (double)airQualityRecords.get(airQualityRecords.size() - 1).getValue();
 
                 setWaveProgress(airQuality);
+                setLineChartData(temperatureRecords);
 
                 //Toast.makeText(getBaseContext(), String.format("%s %s", tables.get(1).getRecords().get(0).getField(),tables.get(1).getRecords().get(0).getValue()), Toast.LENGTH_LONG).show();
             }
@@ -113,8 +146,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public final class LineData{
+    private void setLineChartData(List<FluxRecord> temperatureRecords){
 
+        List<Entry> x = new ArrayList<Entry>();
+        List<String> y = new ArrayList<String>();
+
+        System.out.println(new Gson().toJson(temperatureRecords));
+
+        for(int i = 0; i < temperatureRecords.size(); i++){
+
+            FluxRecord record = temperatureRecords.get(i);
+
+            x.add(new Entry(Float.parseFloat(record.getValue().toString()), i));
+            y.add(record.getTime().toString());
+
+        }
+
+        LineDataSet set1 = new LineDataSet(x, "Temperature");
+        set1.setColors(new int[]{ColorTemplate.rgb("#FF4080")});
+        set1.setLineWidth(1.5f);
+        set1.setCircleRadius(4f);
+        LineData data = new LineData(y, set1);
+        lineChart.setData(data);
+        lineChart.invalidate();
     }
 
 }
